@@ -1,36 +1,31 @@
-const request = require('request');
+const request = require('request')
 
-const fetchBreedDescription = function(breedName, callback) {
-  const apiURL = 'https://api.thecatapi.com/v1/breeds/search';
-
-  if (!breedName) {
-    callback('Please provide a breed name', null);
-    return;
-  }
+const fetchBreedDescription = function (breedName, callback) {
+  const apiURL = 'https://api.thecatapi.com/v1/breeds/search'
 
   request(`${apiURL}?q=${breedName}`, (error, response, body) => {
     if (error) {
-      callback('There was an error making the request:', null);
-      return;
+      callback(error, null)
+      return
     }
 
     if (response.statusCode !== 200) {
-      callback(`Request failed with status code: ${response.statusCode}`, null);
-      return;
+      callback(new Error(`Request failed with status code: ${response.statusCode}`), null)
+      return
     }
 
     try {
-      const data = JSON.parse(body);
+      const data = JSON.parse(body)
       if (data.length === 0) {
-        callback(`Breed "" not found.`, null);
+        callback(null, `${breedName} not found.`)
       } else {
-        const breed = data[0];
-        callback(null, breed.description);
+        const breed = data[0]
+        callback(null, breed.description)
       }
     } catch (parseError) {
-      callback('Error parsing JSON:', null);
+      callback(parseError, null)
     }
-  });
-};
+  })
+}
 
-module.exports = { fetchBreedDescription };
+module.exports = { fetchBreedDescription }
